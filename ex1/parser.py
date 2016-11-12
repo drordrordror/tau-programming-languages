@@ -95,14 +95,54 @@ class JsonParser(Parser):
             raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
 
     def parse_obj(self):
-        #
-        # --- CHANGE THE BODY OF THIS FUNCTION ---
-        #
-        pass
+        if self.t in [LB]:
+            c1 = self.match(LB)
+            c2 = self.parse_obj_right()
+            return (obj, (c1, c2))
+        else:
+            raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
 
-    #
-    # --- FILL IN MORE parse_XXX FUNCTIONS HERE ---
-    #
+    def parse_obj_right(self):
+        if self.t in [RB]:
+            c1 = self.match(RB)
+            return (obj_right, (c1,))
+        elif self.t in [STRING]:
+            c1 = self.parse_members()
+            c2 = self.match(RB)
+            return (obj_right, (c1, c2))
+        else:
+            raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
+
+    def parse_members(self):
+        if self.t in [STRING]:
+            c1 = self.parse_keyvalue()
+            c2 = self.parse_members_right()
+            return (members, (c1, c2))
+        else:
+            raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
+
+    def parse_members_right(self):
+        if self.t in [COMMA]:
+            c1 = self.match(COMMA)
+            c2 = self.parse_members()
+            return (members_right, (c1, c2))
+        elif self.t in [RB]:
+            return (members_right, ())
+        else:
+            raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
+
+    def parse_value(self):
+        if self.t in [STRING]:
+            c1 = self.match(STRING)
+            return (value, (c1,))
+        elif self.t in [INT]:
+            c1 = self.match(INT)
+            return (value, (c1,))
+        elif self.t in [LB]:
+            c1 = self.parse_obj()
+            return (value, (c1,))
+        else:
+            raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
 
 
 def main():
