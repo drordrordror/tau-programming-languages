@@ -210,18 +210,48 @@ grammar_json_4a = [
     #
     # --- FILL IN HERE IN QUESTION 5.a ---
     #
+    (obj, (LB, RB)),                        # obj -> { }
+    (obj, (LB, members, RB)),               # obj -> { members }
+    (members, (keyvalue,)),                 # members -> keyvalue
+    (members, (members, COMMA, members)),   # members -> members , members
+    (keyvalue, (STRING, COLON, value)),     # keyvalue -> string : value
+    (value, (STRING,)),                     # value -> string
+    (value, (INT,)),                        # value -> int
+    (value, (obj,)),                        # value -> obj
 ]
 
 grammar_json_4b = [
     #
     # --- FILL IN HERE IN QUESTION 5.b ---
     #
+    (obj, (LB, obj_right)),                 # obj -> { obj_right
+    (obj_right, (RB,)),                     # obj_right -> }
+    (obj_right, (members, RB)),             # obj_right -> members }
+    (members, (keyvalue, members_right)),   # members -> keyvalue members_right
+    (members_right, (COMMA, members)),      # members_right -> , members
+    (members_right, ()),                    # members_right -> epsilon
+    (keyvalue, (STRING, COLON, value)),     # keyvalue -> string : value
+    (value, (STRING,)),                     # value -> string
+    (value, (INT,)),                        # value -> int
+    (value, (obj,)),                        # value -> obj
 ]
 
 grammar_json_4c = [
     #
     # --- FILL IN HERE IN QUESTION 5.c ---
     #
+
+    # NOTE: this is the same grammar from last question, meaning grammar_json_4c == grammar_json_4b
+    (obj, (LB, obj_right)),                 # obj -> { obj_right
+    (obj_right, (RB,)),                     # obj_right -> }
+    (obj_right, (members, RB)),             # obj_right -> members }
+    (members, (keyvalue, members_right)),   # members -> keyvalue members_right
+    (members_right, (COMMA, members)),      # members_right -> , members
+    (members_right, ()),                    # members_right -> epsilon
+    (keyvalue, (STRING, COLON, value)),     # keyvalue -> string : value
+    (value, (STRING,)),                     # value -> string
+    (value, (INT,)),                        # value -> int
+    (value, (obj,)),                        # value -> obj
 ]
 
 grammar_json__6 = [
@@ -231,7 +261,6 @@ grammar_json__6 = [
 ]
 
 
-
 def main():
     analyze_grammar(grammar_recitation)
     print
@@ -239,12 +268,12 @@ def main():
     #
     # --- UNCOMMENT THE FOLLOWING LINES AS YOU PROCEED ---
     #
-    # analyze_grammar(grammar_json_4a)
-    # print
-    # analyze_grammar(grammar_json_4b)
-    # print
-    # analyze_grammar(grammar_json_4c)
-    # print
+    analyze_grammar(grammar_json_4a)
+    print
+    analyze_grammar(grammar_json_4b)
+    print
+    analyze_grammar(grammar_json_4c)
+    print
     # analyze_grammar(grammar_json_6)
     # print
 
