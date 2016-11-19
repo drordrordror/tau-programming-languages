@@ -50,25 +50,30 @@ def calculate_nullable(terminals, nonterminals, grammar):
 def calculate_first(terminals, nonterminals, grammar, nullable):
     """
     Return a dictionary mapping terminals and nonterminals to their FIRST set
+    Based on the pseudo-code from lecture
     """
+    
+    #Init
     first = dict()
     for t in terminals:
         first[t] = {t}
     for a in nonterminals:
         first[a] = set()
     changing = True
+    
+    #Main loop
     while changing:
         changing = False
-        for head, body in grammar:
-            for i in range(0, len(body)):  # TODO: check for out of range bugs
+        for head, body in grammar: #For each rule
+            for i in range(0, len(body)):  #For each token # TODO: check for out of range bugs
                 if is_nullable(body[0:i], nullable):
-                    for item in first[body[i]]:
+                    for item in first[body[i]]: #Add First(Ai) to First(A)
                         if item not in first[head]:
                             first[head].add(item)
                             changing = True
     return first
 
-
+#Function checks if all the tokens in token_stream are not in nullable set
 def is_nullable(token_stream, nullables):
     for token in token_stream:
         if token not in nullables:
@@ -79,32 +84,35 @@ def is_nullable(token_stream, nullables):
 def calculate_follow(terminals, nonterminals, grammar, nullable, first):
     """
     Return a dictionary mapping terminals and nonterminals to their FOLLOW set
+    Based on the pseudo-code from lecture
     """
+    #Init
     follow = dict()
     for a in nonterminals:
         follow[a] = set()
     start_nonterminal = grammar[0][0]
     follow[start_nonterminal] = {EOF}
-
     changing = True
+    
+    #Main loop
     while changing:
         changing = False
-        for head, body in grammar:
-            for i in range(0, len(body)):  # TODO: check for out of range bugs
-                if body[i] in terminals:  # TODO: check if needed
+        for head, body in grammar:#For each rule
+            for i in range(0, len(body)):  #For each token # TODO: check for out of range bugs
+                if body[i] in terminals:  #Terminals dont have follow # TODO: check if needed
                     continue
                 if is_nullable(body[i+1:], nullable):
-                    for item in follow[head]:
-                        if item not in follow[body[i]]:
+                    for item in follow[head]: #Ai+1,..,An in nullable
+                        if item not in follow[body[i]]:#Add follow(A) to follow(Ai)
                             follow[body[i]].add(item)
                             changing = True
 
-            for i in range(0, len(body) - 1):  # TODO: check for out of range bugs
-                if body[i] in terminals:  # TODO: check if needed
+            for i in range(0, len(body) - 1): #For each token # TODO: check for out of range bugs
+                if body[i] in terminals: #Terminals dont have follow # TODO: check if needed
                     continue
                 for j in range(i + 1, len(body)):  # TODO: check for out of range bugs
-                    if is_nullable(body[i+1:j], nullable):
-                        for item in first[body[j]]:
+                    if is_nullable(body[i+1:j], nullable): #Ai+1,..,Aj-1 in nullable
+                        for item in first[body[j]]:#Add first(Aj) to follow(Ai)
                             if item not in follow[body[i]]:
                                 follow[body[i]].add(item)
                                 changing = True
@@ -118,13 +126,13 @@ def calculate_select(terminals, nonterminals, grammar, nullable, first, follow):
     """
     select = dict()
 
-    for head, body in grammar:
+    for head, body in grammar: #For each rule
         select[head, body] = set()
         if body:  # check that right side of rule is not epsilon
-            for item in body:
+            for item in body: #For each token
                 for x in first[item]:  # add first of item to select of (head, body)
                     select[head, body].add(x)
-                if not is_nullable((item,), nullable):  # TODO check if works
+                if not is_nullable((item,), nullable):#When some "item" not nullable we finished with select
                     break
 
         if is_nullable(body, nullable):
