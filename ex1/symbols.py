@@ -45,3 +45,11 @@ value = 'value'
 #
 obj_right = 'obj_right'
 members_right = 'members_right'
+
+# more terminals for Question 7
+obj_right_set = 'obj_right_set'
+obj_right_arr = 'obj_right_arr'
+members_set = 'members_set'
+members_arr = 'members_arr'
+members_right_set = 'members_right_set'
+members_right_arr = 'members_right_arr'

@@ -61,7 +61,7 @@ def calculate_first(terminals, nonterminals, grammar, nullable):
         changing = False
         for head, body in grammar:
             for i in range(0, len(body)):  # TODO: check for out of range bugs
-                if does_set_contain_tuple(body[0:i], nullable):
+                if is_nullable(body[0:i], nullable):
                     for item in first[body[i]]:
                         if item not in first[head]:
                             first[head].add(item)
@@ -69,9 +69,9 @@ def calculate_first(terminals, nonterminals, grammar, nullable):
     return first
 
 
-def does_set_contain_tuple(tuple, set):
-    for item in tuple:
-        if item not in set:
+def is_nullable(token_stream, nullables):
+    for token in token_stream:
+        if token not in nullables:
             return False
     return True
 
@@ -93,7 +93,7 @@ def calculate_follow(terminals, nonterminals, grammar, nullable, first):
             for i in range(0, len(body)):  # TODO: check for out of range bugs
                 if body[i] in terminals:  # TODO: check if needed
                     continue
-                if does_set_contain_tuple(body[i+1:], nullable):
+                if is_nullable(body[i+1:], nullable):
                     for item in follow[head]:
                         if item not in follow[body[i]]:
                             follow[body[i]].add(item)
@@ -103,7 +103,7 @@ def calculate_follow(terminals, nonterminals, grammar, nullable, first):
                 if body[i] in terminals:  # TODO: check if needed
                     continue
                 for j in range(i + 1, len(body)):  # TODO: check for out of range bugs
-                    if does_set_contain_tuple(body[i+1:j], nullable):
+                    if is_nullable(body[i+1:j], nullable):
                         for item in first[body[j]]:
                             if item not in follow[body[i]]:
                                 follow[body[i]].add(item)
@@ -120,12 +120,14 @@ def calculate_select(terminals, nonterminals, grammar, nullable, first, follow):
 
     for head, body in grammar:
         select[head, body] = set()
-        # TODO: ask Oded if only need to get first of left-most token in right side of rule
-        if body:
-            item = body[0]
-            for x in first[item]:
-                select[head, body].add(x)
-        if does_set_contain_tuple(body, nullable):
+        if body:  # check that right side of rule is not epsilon
+            for item in body:
+                for x in first[item]:  # add first of item to select of (head, body)
+                    select[head, body].add(x)
+                if not is_nullable((item,), nullable):  # TODO check if works
+                    break
+
+        if is_nullable(body, nullable):
             for x in follow[head]:
                 select[head, body].add(x)
 
@@ -254,10 +256,27 @@ grammar_json_4c = [
     (value, (obj,)),                        # value -> obj
 ]
 
-grammar_json__6 = [
+grammar_json_6 = [
     #
     # --- FILL IN HERE IN QUESTION 7 ---
     #
+
+    (obj, (LB, obj_right_set)),                     # obj -> { obj_right_set
+    (obj_right_set, (RB,)),                         # obj_right_set -> }
+    (obj_right_set, (members_set, RB)),             # obj_right_set -> members_set }
+    (obj, (LS, obj_right_arr)),                     # obj -> { obj_right_arr
+    (obj_right_arr, (RS,)),                         # obj_right_arr -> }
+    (obj_right_arr, (members_arr, RS)),             # obj_right_arr -> members_arr }
+    (members_set, (keyvalue, members_right_set)),   # members_set -> keyvalue members_right_set
+    (members_right_set, (COMMA, members_set)),      # members_right_set -> , members_set
+    (members_right_set, ()),                        # members_right_set -> epsilon
+    (members_arr, (keyvalue, members_right_arr)),   # members_arr -> keyvalue members_right_arr
+    (members_right_arr, (COMMA, members_arr)),      # members_right_arr -> , members_arr
+    (members_right_arr, ()),                        # members_right_arr -> epsilon
+    (keyvalue, (STRING, COLON, value)),             # keyvalue -> string : value
+    (value, (STRING,)),                             # value -> string
+    (value, (INT,)),                                # value -> int
+    (value, (obj,)),                                # value -> obj
 ]
 
 
@@ -274,8 +293,8 @@ def main():
     print
     analyze_grammar(grammar_json_4c)
     print
-    # analyze_grammar(grammar_json_6)
-    # print
+    analyze_grammar(grammar_json_6)
+    print
 
     #
     # --- ADD MORE TEST CASES HERE ---
