@@ -192,10 +192,9 @@ def main():
     # --- MODIFY HERE TO ADD MORE TEST CASES ---
     #
 
-    # TODO: delete this?
-    json_example = open('json_array_example.json').read()
-    print json_example
-    tokens = lex(json_example)
+    json_array_example = open('json_array_example.json').read()
+    print json_array_example
+    tokens = lex(json_array_example)
     parser = JsonParser(tokens)
     parse_tree = parser.parse()
     dot = tree_to_dot(parse_tree)

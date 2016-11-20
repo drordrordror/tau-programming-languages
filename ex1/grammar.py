@@ -60,9 +60,9 @@ def calculate_first(terminals, nonterminals, grammar, nullable):
     while changing:
         changing = False
         for head, body in grammar:
-            for i in range(0, len(body)):  # TODO: check for out of range bugs
+            for i in range(0, len(body)):
                 if is_nullable(body[0:i], nullable):
-                    for item in first[body[i]]:
+                    for item in first[body[i]]:  # add First(body[i]) to First[head]
                         if item not in first[head]:
                             first[head].add(item)
                             changing = True
@@ -90,21 +90,21 @@ def calculate_follow(terminals, nonterminals, grammar, nullable, first):
     while changing:
         changing = False
         for head, body in grammar:
-            for i in range(0, len(body)):  # TODO: check for out of range bugs
-                if body[i] in terminals:  # TODO: check if needed
+            for i in range(0, len(body)):
+                if body[i] in terminals:  # Follow is not relevant to terminals
                     continue
                 if is_nullable(body[i+1:], nullable):
-                    for item in follow[head]:
+                    for item in follow[head]:  # add Follow(head) to Follow(body[i])
                         if item not in follow[body[i]]:
                             follow[body[i]].add(item)
                             changing = True
 
-            for i in range(0, len(body) - 1):  # TODO: check for out of range bugs
-                if body[i] in terminals:  # TODO: check if needed
+            for i in range(0, len(body) - 1):
+                if body[i] in terminals:  # Follow is not relevant to terminals
                     continue
-                for j in range(i + 1, len(body)):  # TODO: check for out of range bugs
+                for j in range(i + 1, len(body)):
                     if is_nullable(body[i+1:j], nullable):
-                        for item in first[body[j]]:
+                        for item in first[body[j]]:  # add First(body[j]) to Follow(body[i])
                             if item not in follow[body[i]]:
                                 follow[body[i]].add(item)
                                 changing = True
@@ -124,7 +124,7 @@ def calculate_select(terminals, nonterminals, grammar, nullable, first, follow):
             for item in body:
                 for x in first[item]:  # add first of item to select of (head, body)
                     select[head, body].add(x)
-                if not is_nullable((item,), nullable):  # TODO check if works
+                if not is_nullable((item,), nullable):
                     break
 
         if is_nullable(body, nullable):
