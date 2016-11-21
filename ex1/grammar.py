@@ -261,22 +261,49 @@ grammar_json_6 = [
     # --- FILL IN HERE IN QUESTION 7 ---
     #
 
-    (obj, (LB, obj_right_set)),                     # obj -> { obj_right_set
-    (obj_right_set, (RB,)),                         # obj_right_set -> }
-    (obj_right_set, (members_set, RB)),             # obj_right_set -> members_set }
-    (obj, (LS, obj_right_arr)),                     # obj -> { obj_right_arr
-    (obj_right_arr, (RS,)),                         # obj_right_arr -> }
-    (obj_right_arr, (members_arr, RS)),             # obj_right_arr -> members_arr }
+    # TODO: this version will include words like {'key':[[]]}
+    (obj, (LB, obj_right)),                         # obj -> { obj_right
+    (obj_right, (RB,)),                             # obj_right -> }
+    (obj_right, (members_set, RB)),                 # obj_right -> members_set }
+    (arr, (LS, arr_right)),                         # arr -> { arr_right
+    (arr_right, (RS,)),                             # obj_right_arr -> }
+    (arr_right, (members_arr, RS)),                 # obj_right_arr -> members_arr }
     (members_set, (keyvalue, members_right_set)),   # members_set -> keyvalue members_right_set
     (members_right_set, (COMMA, members_set)),      # members_right_set -> , members_set
     (members_right_set, ()),                        # members_right_set -> epsilon
-    (members_arr, (keyvalue, members_right_arr)),   # members_arr -> keyvalue members_right_arr
+    (members_arr, (value, members_right_arr)),      # members_arr -> value members_right_arr
     (members_right_arr, (COMMA, members_arr)),      # members_right_arr -> , members_arr
     (members_right_arr, ()),                        # members_right_arr -> epsilon
     (keyvalue, (STRING, COLON, value)),             # keyvalue -> string : value
     (value, (STRING,)),                             # value -> string
     (value, (INT,)),                                # value -> int
+    (value, (arr,)),                                # value -> arr
     (value, (obj,)),                                # value -> obj
+
+    # TODO: this version will NOT include words like {'key':[[]]}
+    (obj, (LB, obj_right)),                         # obj -> { obj_right
+    (obj_right, (RB,)),                             # obj_right -> }
+    (obj_right, (members_set, RB)),                 # obj_right -> members_set }
+    (arr, (LS, arr_right)),                         # arr -> { arr_right
+    (arr_right, (RS,)),                             # obj_right_arr -> }
+    (arr_right, (members_arr, RS)),                 # obj_right_arr -> members_arr }
+    (members_set, (keyvalue, members_right_set)),   # members_set -> keyvalue members_right_set
+    (members_right_set, (COMMA, members_set)),      # members_right_set -> , members_set
+    (members_right_set, ()),                        # members_right_set -> epsilon
+    (members_arr, (value_arr, members_right_arr)),  # members_arr -> value_arr members_right_arr
+    (members_right_arr, (COMMA, members_arr)),      # members_right_arr -> , members_arr
+    (members_right_arr, ()),                        # members_right_arr -> epsilon
+    (keyvalue, (STRING, COLON, value_set)),         # keyvalue -> string : value_set
+    (value_set, (STRING,)),                         # value_set -> string
+    (value_set, (INT,)),                            # value_set -> int
+    (value_set, (arr,)),                            # value_set -> arr
+    (value_set, (obj,)),                            # value_set -> obj
+    (value_arr, (STRING,)),                         # value_arr -> string
+    (value_arr, (INT,)),                            # value_arr -> int
+    (value_arr, (obj,)),                            # value_arr -> obj
+
+    # TODO: Keep only one of the versions and delete the other
+    # TODO: Edit the parser to fit the grammar
 ]
 
 
