@@ -60,9 +60,9 @@ def calculate_first(terminals, nonterminals, grammar, nullable):
     while changing:
         changing = False
         for head, body in grammar:
-            for i in range(0, len(body)):  # TODO: check for out of range bugs
+            for i in range(0, len(body)):
                 if is_nullable(body[0:i], nullable):
-                    for item in first[body[i]]:
+                    for item in first[body[i]]:  # add First(body[i]) to First[head]
                         if item not in first[head]:
                             first[head].add(item)
                             changing = True
@@ -90,21 +90,21 @@ def calculate_follow(terminals, nonterminals, grammar, nullable, first):
     while changing:
         changing = False
         for head, body in grammar:
-            for i in range(0, len(body)):  # TODO: check for out of range bugs
-                if body[i] in terminals:  # TODO: check if needed
+            for i in range(0, len(body)):
+                if body[i] in terminals:  # Follow is not relevant to terminals
                     continue
                 if is_nullable(body[i+1:], nullable):
-                    for item in follow[head]:
+                    for item in follow[head]:  # add Follow(head) to Follow(body[i])
                         if item not in follow[body[i]]:
                             follow[body[i]].add(item)
                             changing = True
 
-            for i in range(0, len(body) - 1):  # TODO: check for out of range bugs
-                if body[i] in terminals:  # TODO: check if needed
+            for i in range(0, len(body) - 1):
+                if body[i] in terminals:  # Follow is not relevant to terminals
                     continue
-                for j in range(i + 1, len(body)):  # TODO: check for out of range bugs
+                for j in range(i + 1, len(body)):
                     if is_nullable(body[i+1:j], nullable):
-                        for item in first[body[j]]:
+                        for item in first[body[j]]:  # add First(body[j]) to Follow(body[i])
                             if item not in follow[body[i]]:
                                 follow[body[i]].add(item)
                                 changing = True
@@ -124,7 +124,7 @@ def calculate_select(terminals, nonterminals, grammar, nullable, first, follow):
             for item in body:
                 for x in first[item]:  # add first of item to select of (head, body)
                     select[head, body].add(x)
-                if not is_nullable((item,), nullable):  # TODO check if works
+                if not is_nullable((item,), nullable):
                     break
 
         if is_nullable(body, nullable):
@@ -261,22 +261,49 @@ grammar_json_6 = [
     # --- FILL IN HERE IN QUESTION 7 ---
     #
 
-    (obj, (LB, obj_right_set)),                     # obj -> { obj_right_set
-    (obj_right_set, (RB,)),                         # obj_right_set -> }
-    (obj_right_set, (members_set, RB)),             # obj_right_set -> members_set }
-    (obj, (LS, obj_right_arr)),                     # obj -> { obj_right_arr
-    (obj_right_arr, (RS,)),                         # obj_right_arr -> }
-    (obj_right_arr, (members_arr, RS)),             # obj_right_arr -> members_arr }
+    # TODO: this version will include words like {'key':[[]]}
+    (obj, (LB, obj_right)),                         # obj -> { obj_right
+    (obj_right, (RB,)),                             # obj_right -> }
+    (obj_right, (members_set, RB)),                 # obj_right -> members_set }
+    (arr, (LS, arr_right)),                         # arr -> { arr_right
+    (arr_right, (RS,)),                             # obj_right_arr -> }
+    (arr_right, (members_arr, RS)),                 # obj_right_arr -> members_arr }
     (members_set, (keyvalue, members_right_set)),   # members_set -> keyvalue members_right_set
     (members_right_set, (COMMA, members_set)),      # members_right_set -> , members_set
     (members_right_set, ()),                        # members_right_set -> epsilon
-    (members_arr, (keyvalue, members_right_arr)),   # members_arr -> keyvalue members_right_arr
+    (members_arr, (value, members_right_arr)),      # members_arr -> value members_right_arr
     (members_right_arr, (COMMA, members_arr)),      # members_right_arr -> , members_arr
     (members_right_arr, ()),                        # members_right_arr -> epsilon
     (keyvalue, (STRING, COLON, value)),             # keyvalue -> string : value
     (value, (STRING,)),                             # value -> string
     (value, (INT,)),                                # value -> int
+    (value, (arr,)),                                # value -> arr
     (value, (obj,)),                                # value -> obj
+
+    # TODO: this version will NOT include words like {'key':[[]]}
+    (obj, (LB, obj_right)),                         # obj -> { obj_right
+    (obj_right, (RB,)),                             # obj_right -> }
+    (obj_right, (members_set, RB)),                 # obj_right -> members_set }
+    (arr, (LS, arr_right)),                         # arr -> { arr_right
+    (arr_right, (RS,)),                             # obj_right_arr -> }
+    (arr_right, (members_arr, RS)),                 # obj_right_arr -> members_arr }
+    (members_set, (keyvalue, members_right_set)),   # members_set -> keyvalue members_right_set
+    (members_right_set, (COMMA, members_set)),      # members_right_set -> , members_set
+    (members_right_set, ()),                        # members_right_set -> epsilon
+    (members_arr, (value_arr, members_right_arr)),  # members_arr -> value_arr members_right_arr
+    (members_right_arr, (COMMA, members_arr)),      # members_right_arr -> , members_arr
+    (members_right_arr, ()),                        # members_right_arr -> epsilon
+    (keyvalue, (STRING, COLON, value_set)),         # keyvalue -> string : value_set
+    (value_set, (STRING,)),                         # value_set -> string
+    (value_set, (INT,)),                            # value_set -> int
+    (value_set, (arr,)),                            # value_set -> arr
+    (value_set, (obj,)),                            # value_set -> obj
+    (value_arr, (STRING,)),                         # value_arr -> string
+    (value_arr, (INT,)),                            # value_arr -> int
+    (value_arr, (obj,)),                            # value_arr -> obj
+
+    # TODO: Keep only one of the versions and delete the other
+    # TODO: Edit the parser to fit the grammar
 ]
 
 
