@@ -1,9 +1,5 @@
-{
-	"set_key_1":[ 7,
-			  {
-				"set_key_2":"yes", "set_val":[]
-			  },
-			  "wow",
-			  [1, 1, "nu kvar"]
-			]
-}
+{"array":[1,
+"two",
+{"object inside array?":"yes",
+"empty array":[]
+}]}

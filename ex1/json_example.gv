@@ -1,7 +1,7 @@
 digraph G {
     0 [label="obj"];
     1 [label="{"];
-    2 [label="obj_right_set"];
+    2 [label="obj_right"];
     3 [label="members_set"];
     4 [label="keyvalue"];
     5 [label="\"glossary\""];
@@ -9,7 +9,7 @@ digraph G {
     7 [label="value"];
     8 [label="obj"];
     9 [label="{"];
-    10 [label="obj_right_set"];
+    10 [label="obj_right"];
     11 [label="members_set"];
     12 [label="keyvalue"];
     13 [label="\"title\""];
@@ -33,7 +33,7 @@ digraph G {
     31 [label="value"];
     32 [label="obj"];
     33 [label="{"];
-    34 [label="obj_right_set"];
+    34 [label="obj_right"];
     35 [label="members_set"];
     36 [label="keyvalue"];
     37 [label="\"title\""];
@@ -49,7 +49,7 @@ digraph G {
     47 [label="value"];
     48 [label="obj"];
     49 [label="{"];
-    50 [label="obj_right_set"];
+    50 [label="obj_right"];
     51 [label="members_set"];
     52 [label="keyvalue"];
     53 [label="\"GlossEntry\""];
@@ -57,7 +57,7 @@ digraph G {
     55 [label="value"];
     56 [label="obj"];
     57 [label="{"];
-    58 [label="obj_right_set"];
+    58 [label="obj_right"];
     59 [label="members_set"];
     60 [label="keyvalue"];
     61 [label="\"ID\""];
@@ -105,7 +105,7 @@ digraph G {
     103 [label="value"];
     104 [label="obj"];
     105 [label="{"];
-    106 [label="obj_right_set"];
+    106 [label="obj_right"];
     107 [label="members_set"];
     108 [label="keyvalue"];
     109 [label="\"para\""];

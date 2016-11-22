@@ -97,34 +97,38 @@ class JsonParser(Parser):
     def parse_obj(self):
         if self.t in [LB]:
             c1 = self.match(LB)
-            c2 = self.parse_obj_right_set()
-            return (obj, (c1, c2))
-        elif self.t in [LS]:
-            c1 = self.match(LS)
-            c2 = self.parse_obj_right_arr()
+            c2 = self.parse_obj_right()
             return (obj, (c1, c2))
         else:
             raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
 
-    def parse_obj_right_set(self):
+    def parse_obj_right(self):
         if self.t in [RB]:
             c1 = self.match(RB)
-            return (obj_right_set, (c1,))
+            return (obj_right, (c1,))
         elif self.t in [STRING]:
             c1 = self.parse_members_set()
             c2 = self.match(RB)
-            return (obj_right_set, (c1, c2))
+            return (obj_right, (c1, c2))
         else:
             raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
 
-    def parse_obj_right_arr(self):
+    def parse_arr(self):
+        if self.t in [LS]:
+            c1 = self.match(LS)
+            c2 = self.parse_arr_right()
+            return (arr, (c1,))
+        else:
+            raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
+
+    def parse_arr_right(self):
         if self.t in [RS]:
             c1 = self.match(RS)
-            return (obj_right_arr, (c1,))
+            return (arr_right, (c1,))
         elif self.t in [STRING, INT, LB, LS]:
             c1 = self.parse_members_arr()
             c2 = self.match(RS)
-            return (obj_right_arr, (c1, c2))
+            return (arr_right, (c1, c2))
         else:
             raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
 
@@ -137,8 +141,8 @@ class JsonParser(Parser):
             raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
 
     def parse_members_arr(self):
-        if self.t in [STRING, INT, LB, LS]:
-            c1 = self.parse_value()
+        if self.t in [STRING, INT, LB]:
+            c1 = self.parse_value_arr()
             c2 = self.parse_members_right_arr()
             return (members_arr, (c1, c2))
         else:
@@ -168,7 +172,20 @@ class JsonParser(Parser):
         if self.t in [STRING, INT]:
             c1 = self.match(self.t)
             return (value, (c1,))
-        elif self.t in [LB, LS]:
+        elif self.t in [LB]:
+            c1 = self.parse_obj()
+            return (value, (c1,))
+        elif self.t in [LS]:
+            c1 = self.parse_arr()
+            return (value, (c1,))
+        else:
+            raise SyntaxError("Syntax error: no rule for token: {}".format(self.t))
+
+    def parse_value_arr(self):
+        if self.t in [STRING, INT]:
+            c1 = self.match(self.t)
+            return (value, (c1,))
+        elif self.t in [LB]:
             c1 = self.parse_obj()
             return (value, (c1,))
         else:
@@ -193,6 +210,15 @@ def main():
     #
 
     json_array_example = open('json_array_example.json').read()
+    print json_array_example
+    tokens = lex(json_array_example)
+    parser = JsonParser(tokens)
+    parse_tree = parser.parse()
+    dot = tree_to_dot(parse_tree)
+    open('json_array_example.gv', 'w').write(dot)
+    view(dot)
+
+    json_array_example = open('our_json_array_example.json').read()
     print json_array_example
     tokens = lex(json_array_example)
     parser = JsonParser(tokens)
